@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getExpenses, createExpense, fetchCategories } from "../services/api";
+import { getExpenses, createExpense, fetchCategories, createCategory } from "../services/api";
 import { Category, Expense, ExpenseFormData } from "../types";
 import YearNavigation from "../components/YearNavigation";
 import { MonthNavigation } from "../components/MonthNavigation";
@@ -8,11 +8,14 @@ import { CalendarExpenseTable } from "../components/CalendarExpenseTable";
 import { ExpenseForm } from "../components/ExpenseForm";
 import { Modal, Button } from "../vibes";
 import { COLORS } from "../constants/colors";
+import { CategoryForm } from "../components/CategoryForm";
 
 const HistoryPage: React.FC = () => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
   const [_isLoadingCategories, setIsLoadingCategories] = useState(true);
   const [fetchedCategories, setFetchedCategories] = useState<Category[]>([]);
@@ -81,6 +84,17 @@ const HistoryPage: React.FC = () => {
       fetchExpenses();
     } catch (error) {
       console.error("Error creating expense:", error);
+      throw error;
+    }
+  };
+
+  const handleAddCategory = async (name: string) => {
+    try {
+      await createCategory({ name });
+      setIsCategoryModalOpen(false);
+      handleFetchCategories();
+    } catch (error) {
+      console.error("Error creating category:", error);
       throw error;
     }
   };
@@ -168,9 +182,14 @@ const HistoryPage: React.FC = () => {
             onYearChange={handleYearChange}
           />
         </div>
-        <Button variant="primary" onClick={() => setIsModalOpen(true)}>
-          Add Expense
-        </Button>
+        <div style={{ display: "flex", gap: "12px" }}>
+          <Button variant="secondary" onClick={() => setIsCategoryModalOpen(true)}>
+            Add Category
+          </Button>
+          <Button variant="primary" onClick={() => setIsModalOpen(true)}>
+            Add Expense
+          </Button>
+        </div>
       </div>
 
       <MonthNavigation
@@ -208,6 +227,17 @@ const HistoryPage: React.FC = () => {
           categories={fetchedCategories}
           onSubmit={handleAddExpense}
           onCancel={() => setIsModalOpen(false)}
+        />
+      </Modal>
+
+      <Modal
+        isOpen={isCategoryModalOpen}
+        onClose={() => setIsCategoryModalOpen(false)}
+        title="Add New Category"
+      >
+        <CategoryForm
+          onSubmit={handleAddCategory}
+          onCancel={() => setIsCategoryModalOpen(false)}
         />
       </Modal>
     </div>
