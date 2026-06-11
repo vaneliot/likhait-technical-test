@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { getExpenses, createExpense } from "../services/api";
-import { Expense, ExpenseFormData } from "../types";
+import { getExpenses, createExpense, fetchCategories } from "../services/api";
+import { Category, Expense, ExpenseFormData } from "../types";
 import YearNavigation from "../components/YearNavigation";
 import { MonthNavigation } from "../components/MonthNavigation";
 import CategoryBreakdown from "../components/CategoryBreakdown";
@@ -13,6 +13,9 @@ const HistoryPage: React.FC = () => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [_isLoadingCategories, setIsLoadingCategories] = useState(true);
+  const [fetchedCategories, setFetchedCategories] = useState<Category[]>([]);
 
   // Get year and month from URL params, default to current date if not provided
   const getInitialYearMonth = () => {
@@ -81,6 +84,23 @@ const HistoryPage: React.FC = () => {
       throw error;
     }
   };
+
+  const handleFetchCategories = async () => {
+    try {
+      setIsLoadingCategories(true);
+      const data = await fetchCategories();
+      setFetchedCategories(data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      setFetchedCategories([])
+    } finally {
+      setIsLoadingCategories(false);
+    }
+  };
+
+  useEffect(() => {
+    handleFetchCategories()
+  }, []);
 
   // Calculate category breakdown
   const categoryData = expenses.reduce(
@@ -185,6 +205,7 @@ const HistoryPage: React.FC = () => {
         title="Add New Expense"
       >
         <ExpenseForm
+          categories={fetchedCategories}
           onSubmit={handleAddExpense}
           onCancel={() => setIsModalOpen(false)}
         />
