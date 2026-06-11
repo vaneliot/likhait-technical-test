@@ -47,3 +47,7 @@ export interface DayExpenses {
   expenses: Expense[];
   total: number;
 }
+
+export interface CategoryFormData {
+  name: string;
+}
