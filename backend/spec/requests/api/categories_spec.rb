@@ -57,6 +57,13 @@ RSpec.describe "Api::Categories", type: :request do
       end
     end
 
+    context "when name is empty" do
+      it "returns unprocessable entity" do
+        post "/api/categories", params: { category: { name: "" } }, as: :json
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+    end
+
     context "when name already exists" do
       let(:category_name) { "Subscriptions" }
 
