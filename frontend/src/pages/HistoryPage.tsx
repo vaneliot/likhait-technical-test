@@ -79,7 +79,8 @@ const HistoryPage: React.FC = () => {
 
   const handleAddExpense = async (data: ExpenseFormData) => {
     try {
-      await createExpense(data);
+      const category = fetchedCategories.find((c) => c.name === data.category);
+      await createExpense(data, category?.id);
       setIsModalOpen(false);
       fetchExpenses();
     } catch (error) {
