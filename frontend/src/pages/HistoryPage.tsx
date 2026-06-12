@@ -15,7 +15,7 @@ const HistoryPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Get year, month, and page from URL params, default to current date/page 1 if not provided
-  const getInitialParams = () => {
+  const getURLParams = () => {
     const params = new URLSearchParams(window.location.search);
     const currentDate = new Date();
     const yearParam = params.get("year");
@@ -29,7 +29,7 @@ const HistoryPage: React.FC = () => {
     };
   };
 
-  const initial = getInitialParams();
+  const initial = getURLParams();
   const [selectedYear, setSelectedYear] = useState(initial.year);
   const [selectedMonth, setSelectedMonth] = useState(initial.month);
   const [currentPage, setCurrentPage] = useState(initial.page);
@@ -56,7 +56,7 @@ const HistoryPage: React.FC = () => {
   // Sync state from URL on browser back/forward
   useEffect(() => {
     const handlePopState = () => {
-      const { year, month, page } = getInitialParams();
+      const { year, month, page } = getURLParams();
       setSelectedYear(year);
       setSelectedMonth(month);
       setCurrentPage(page);
