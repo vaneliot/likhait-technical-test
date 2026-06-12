@@ -14,35 +14,55 @@ const HistoryPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Get year and month from URL params, default to current date if not provided
-  const getInitialYearMonth = () => {
+  // Get year, month, and page from URL params, default to current date/page 1 if not provided
+  const getURLParams = () => {
     const params = new URLSearchParams(window.location.search);
     const currentDate = new Date();
     const yearParam = params.get("year");
     const monthParam = params.get("month");
+    const pageParam = params.get("page");
 
     return {
       year: yearParam ? parseInt(yearParam) : currentDate.getFullYear(),
       month: monthParam ? parseInt(monthParam) : currentDate.getMonth() + 1,
+      page: pageParam ? parseInt(pageParam) : 1,
     };
   };
 
-  const initial = getInitialYearMonth();
+  const initial = getURLParams();
   const [selectedYear, setSelectedYear] = useState(initial.year);
   const [selectedMonth, setSelectedMonth] = useState(initial.month);
+  const [currentPage, setCurrentPage] = useState(initial.page);
 
-  // Update URL when year or month changes
-  const updateURL = (year: number, month: number) => {
+  // Update URL when year, month, or page changes; use replace=true for page-only changes to avoid polluting history
+  const updateURL = (year: number, month: number, page: number, replace = false) => {
     const params = new URLSearchParams();
     params.set("year", year.toString());
     params.set("month", month.toString());
+    params.set("page", page.toString());
     const newURL = `${window.location.pathname}?${params.toString()}`;
-    window.history.pushState({}, "", newURL);
+    if (replace) {
+      window.history.replaceState({}, "", newURL);
+    } else {
+      window.history.pushState({}, "", newURL);
+    }
   };
 
   // Initialize URL params if not present
   useEffect(() => {
-    updateURL(selectedYear, selectedMonth);
+    updateURL(selectedYear, selectedMonth, currentPage, true);
+  }, []);
+
+  // Sync state from URL on browser back/forward
+  useEffect(() => {
+    const handlePopState = () => {
+      const { year, month, page } = getURLParams();
+      setSelectedYear(year);
+      setSelectedMonth(month);
+      setCurrentPage(page);
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
   useEffect(() => {
@@ -63,12 +83,19 @@ const HistoryPage: React.FC = () => {
 
   const handleYearChange = (year: number) => {
     setSelectedYear(year);
-    updateURL(year, selectedMonth);
+    setCurrentPage(1);
+    updateURL(year, selectedMonth, 1, false);
   };
 
   const handleMonthChange = (month: number) => {
     setSelectedMonth(month);
-    updateURL(selectedYear, month);
+    setCurrentPage(1);
+    updateURL(selectedYear, month, 1, false);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    updateURL(selectedYear, selectedMonth, page, true);
   };
 
   const handleAddExpense = async (data: ExpenseFormData) => {
@@ -173,6 +200,8 @@ const HistoryPage: React.FC = () => {
               <CalendarExpenseTable
                 expenses={expenses}
                 onExpenseUpdated={fetchExpenses}
+                currentPage={currentPage}
+                onPageChange={handlePageChange}
               />
             </div>
           </>
