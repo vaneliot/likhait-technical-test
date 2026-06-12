@@ -53,6 +53,18 @@ const HistoryPage: React.FC = () => {
     updateURL(selectedYear, selectedMonth, currentPage, true);
   }, []);
 
+  // Sync state from URL on browser back/forward
+  useEffect(() => {
+    const handlePopState = () => {
+      const { year, month, page } = getInitialParams();
+      setSelectedYear(year);
+      setSelectedMonth(month);
+      setCurrentPage(page);
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
   useEffect(() => {
     fetchExpenses();
   }, [selectedYear, selectedMonth]);
