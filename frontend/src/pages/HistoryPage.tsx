@@ -212,6 +212,7 @@ const HistoryPage: React.FC = () => {
               <CalendarExpenseTable
                 expenses={expenses}
                 onExpenseUpdated={fetchExpenses}
+                categories={fetchedCategories}
               />
             </div>
           </>
