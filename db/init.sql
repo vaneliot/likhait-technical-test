@@ -1,3 +1,4 @@
+-- NOTE: Superseded by Rails migrations. No longer executed (Docker mount removed). May contain schema drift e.g. on date, payer_name.
 -- Create database if not exists
 CREATE DATABASE IF NOT EXISTS expense_system_development CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

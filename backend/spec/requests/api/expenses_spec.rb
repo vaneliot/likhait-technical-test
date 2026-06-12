@@ -24,6 +24,34 @@ RSpec.describe "Api::Expenses", type: :request do
       expect(json.first["id"]).to eq(expense2.id)
       expect(json.last["id"]).to eq(expense1.id)
     end
+
+    context "when filtering by year and month" do
+      let!(:other_month_expense) { Expense.create!(description: "Groceries", amount: 75.00, category: food_category, date: base_date.next_month) }
+
+      it "returns only expenses for the specified month" do
+        get "/api/expenses", params: { year: base_date.year, month: base_date.month }
+
+        expect(response).to have_http_status(:success)
+        json = JSON.parse(response.body)
+        expect(json.length).to eq(2)
+        expect(json.map { |e| e["id"] }).to match_array([expense1.id, expense2.id])
+      end
+
+      it "excludes expenses from other months" do
+        get "/api/expenses", params: { year: base_date.next_month.year, month: base_date.next_month.month }
+
+        json = JSON.parse(response.body)
+        expect(json.length).to eq(1)
+        expect(json.first["id"]).to eq(other_month_expense.id)
+      end
+
+      it "returns empty when no expenses exist for the specified month" do
+        get "/api/expenses", params: { year: base_date.year, month: base_date.month + 2 }
+
+        json = JSON.parse(response.body)
+        expect(json).to be_empty
+      end
+    end
   end
 
   describe "POST /api/expenses" do
@@ -51,8 +79,8 @@ RSpec.describe "Api::Expenses", type: :request do
       end
     end
 
-    context "with invalid parameters" do
-      it "with negative amounts" do
+    context "with currently unvalidated parameters" do
+      it "currently accepts negative amounts" do
         invalid_params = {
           expense: {
             description: "Invalid expense",
@@ -69,7 +97,7 @@ RSpec.describe "Api::Expenses", type: :request do
         expect(response).to have_http_status(:created)
       end
 
-      it "with empty descriptions" do
+      it "currently accepts empty descriptions" do
         invalid_params = {
           expense: {
             description: "",

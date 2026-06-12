@@ -3,6 +3,5 @@ FactoryBot.define do
     description { "MyString" }
     amount { "9.99" }
     category { nil }
-    payer_name { "MyString" }
   end
 end
