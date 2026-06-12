@@ -79,8 +79,8 @@ RSpec.describe "Api::Expenses", type: :request do
       end
     end
 
-    context "with invalid parameters" do
-      it "with negative amounts" do
+    context "with currently unvalidated parameters" do
+      it "currently accepts negative amounts" do
         invalid_params = {
           expense: {
             description: "Invalid expense",
@@ -97,7 +97,7 @@ RSpec.describe "Api::Expenses", type: :request do
         expect(response).to have_http_status(:created)
       end
 
-      it "with empty descriptions" do
+      it "currently accepts empty descriptions" do
         invalid_params = {
           expense: {
             description: "",
