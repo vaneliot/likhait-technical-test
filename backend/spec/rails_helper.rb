@@ -79,4 +79,8 @@ RSpec.configure do |config|
     end
   end
 
+  config.before(:each, type: :request) do
+    host! "localhost"
+  end
+
 end

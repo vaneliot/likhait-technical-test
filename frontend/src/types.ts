@@ -25,6 +25,11 @@ export interface MonthlySummary {
   topCategories: TopCategory[];
 }
 
+export interface Category {
+  id: number;
+  name: string;
+}
+
 export interface CategoryBreakdown {
   category: string;
   total: number;
@@ -41,4 +46,8 @@ export interface DayExpenses {
   day: number;
   expenses: Expense[];
   total: number;
+}
+
+export interface CategoryFormData {
+  name: string;
 }
