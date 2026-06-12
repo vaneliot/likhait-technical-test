@@ -1,8 +1,7 @@
 class Api::CategoriesController < ApplicationController
   def index
     categories = Category.order(:name)
-    render json: categories
-    # render json: categories.map { |c| format_category(c) }
+    render json: categories.map { |c| format_category(c) }
   end
 
   def create
