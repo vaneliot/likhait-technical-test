@@ -5,8 +5,9 @@ RSpec.describe "Api::Expenses", type: :request do
   let!(:transport_category) { Category.create!(name: "Transport") }
 
   describe "GET /api/expenses" do
-  let!(:expense1) { Expense.create!(description: "Lunch", amount: 100.00, category: food_category, date: Date.new(2026, 1, 1)) }
-  let!(:expense2) { Expense.create!(description: "Taxi", amount: 50.00, category: transport_category, date: Date.new(2026, 1, 2)) }
+    let(:base_date) { Date.new(2026, 1, 1) }
+    let!(:expense1) { Expense.create!(description: "Lunch", amount: 100.00, category: food_category, date: base_date) }
+    let!(:expense2) { Expense.create!(description: "Taxi", amount: 50.00, category: transport_category, date: base_date + 1) }
 
     it "returns all expenses with category information" do
       get "/api/expenses"
